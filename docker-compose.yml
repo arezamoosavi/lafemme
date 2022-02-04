@@ -1,0 +1,50 @@
+version: "3"
+
+services:
+
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.1.1-java8
+    container_name: namenode
+    volumes:
+      - ./data/namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+    env_file:
+      - ./hadoop-hive.env
+    ports:
+      - 50070:50070
+
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.1.1-java8
+    depends_on:
+      - namenode
+    volumes:
+      - ./data/datanode:/hadoop/dfs/data
+    env_file:
+      - ./hadoop-hive.env
+    ports:
+      - 50075:50075
+
+  hive-server:
+    build: ./docker-hive
+    container_name: hive-server
+    depends_on:
+      - datanode
+    env_file:
+      - ./hadoop-hive.env
+    ports:
+      - 10000:10000
+
+  hive-metastore:
+    build: ./docker-hive
+    container_name: hive-metastore
+    depends_on:
+      - datanode
+    env_file:
+      - ./hadoop-hive.env
+    command: /opt/hive/bin/hive --service metastore
+    ports:
+      - 9083:9083
+
+  hive-metastore-postgresql:
+    image: bde2020/hive-metastore-postgresql:3.1.0
