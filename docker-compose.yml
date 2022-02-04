@@ -25,16 +25,6 @@ services:
     ports:
       - 50075:50075
 
-  hive-server:
-    build: ./docker-hive
-    container_name: hive-server
-    depends_on:
-      - datanode
-    env_file:
-      - ./hadoop-hive.env
-    ports:
-      - 10000:10000
-
   hive-metastore:
     build: ./docker-hive
     container_name: hive-metastore
